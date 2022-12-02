@@ -3,8 +3,7 @@ from gui import *
 
 def main():
     window = Tk()
-    window.title('Contest Entry')
-    window.geometry('500x250')
+    window.title('Contest Entry Form')
     window.resizable(False, False)
     widgets = GUI(window)
     window.mainloop()
