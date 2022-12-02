@@ -7,18 +7,30 @@ class GUI:
         self.window = window
 
         self.frame_name = Frame(self.window)
-        self.label_name = Label(self.frame_name, text='Name')
-        self.entry_name = Entry(self.frame_name)
+        self.label_name = Label(self.frame_name, text='Enter Name')
+        self.label_first = Label(self.frame_name, text='First:')
+        self.entry_first = Entry(self.frame_name)
+        self.label_last = Label(self.frame_name, text='Last:')
+        self.entry_last = Entry(self.frame_name)
         self.label_name.pack(padx=5, side='left')
-        self.entry_name.pack(padx=5, side='left')
+        self.label_first.pack(padx=10, side='left')
+        self.entry_first.pack(padx=1, side='left')
+        self.label_last.pack(padx=5, side='left')
+        self.entry_last.pack(padx=1, side='left')
         self.frame_name.pack(anchor='w', pady=10)  # anchor='w' helps to change the frame position from center to west.
 
-        self.frame_age = Frame(self.window)
-        self.label_age = Label(self.frame_age, text='Age')
-        self.entry_age = Entry(self.frame_age)
-        self.label_age.pack(padx=5, side='left')
-        self.entry_age.pack(padx=10, side='left')
-        self.frame_age.pack(anchor='w', pady=10)
+        self.frame_contact = Frame(self.window)
+        self.label_contact = Label(self.frame_contact, text='Contact Info')
+        self.label_email = Label(self.frame_contact, text='Email:')
+        self.entry_email = Entry(self.frame_contact)
+        self.label_phone = Label(self.frame_contact, text='Phone:')
+        self.entry_phone = Entry(self.frame_contact)
+        self.label_contact.pack(padx=5, side='left')
+        self.label_email.pack(padx=10, side='left')
+        self.entry_email.pack(padx=1, side='left')
+        self.label_phone.pack(padx=5, side='left')
+        self.entry_phone.pack(padx=1, side='left')
+        self.frame_contact.pack(anchor='w', pady=10)
 
         self.frame_status = Frame(self.window)
         self.radio_var = IntVar()
@@ -33,14 +45,19 @@ class GUI:
         self.radio_both.pack(padx=5, side='left')
         self.frame_status.pack(anchor='w', pady=10)
 
-        self.frame_button = Frame(self.window)
-        self.button_save = Button(self.frame_button, text='SAVE', command=self.clicked)
-        self.button_save.pack()
-        self.frame_button.pack(anchor='n')
+        self.frame_buttons = Frame(self.window)
+        self.button_enter = Button(self.frame_buttons, text='SUBMIT ENTRY', command=self.clicked_submit)
+        self.button_enter.pack()
+        self.button_clear = Button(self.frame_buttons, text='CLEAR ENTRY', command=self.clear)
+        self.button_clear.pack()
+        self.frame_buttons.pack(anchor='n')
 
-    def clicked(self):
-        name = self.entry_name.get()
-        age = int(self.entry_age.get()) * 2
+    def clicked_submit(self):
+        first_name = self.entry_first.get()
+        last_name = self.entry_last.get()
+        email = self.entry_email.get()
+        phone = self.entry_phone.get()
+
         status = 'Unselected'
         radio = self.radio_var.get()
 
@@ -51,10 +68,15 @@ class GUI:
         elif radio == 3:
             status = 'Both'
 
+        self.clear()
+
         with open('records.csv', 'a', newline='') as csvfile:
             content = csv.writer(csvfile, delimiter=',')
-            content.writerow([name, age, status])
+            content.writerow([last_name, first_name, email, phone, status])
 
-        self.entry_name.delete(0, END)
-        self.entry_age.delete(0, END)
+    def clear(self):
+        self.entry_first.delete(0, END)
+        self.entry_last.delete(0, END)
+        self.entry_email.delete(0, END)
+        self.entry_phone.delete(0, END)
         self.radio_var.set(0)
