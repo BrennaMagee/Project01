@@ -1,5 +1,6 @@
 import csv
 from tkinter import *
+from tkinter import messagebox
 from tkinter.ttk import Combobox
 
 
@@ -41,21 +42,29 @@ class GUI:
         self.label_status = Label(self.user_info_frame, text='Status')
         self.label_status.grid(row=2, column=2)
         self.combobox_status = Combobox(self.user_info_frame, values=["Full-time", "Part-time", "Student",
-                                                                      "Unemployed", "Prefer not to answer"])
+                                                                     "Unemployed", "Prefer not to answer"])
         self.combobox_status.grid(row=3, column=2)
 
         for widget in self.user_info_frame.winfo_children():
             widget.grid_configure(padx=5, pady=5)
 
-        # Terms and conditions frame
+        # Terms and conditions and Contest rules frame
         self.terms_frame = LabelFrame(self.frame)
         self.terms_frame.grid(row=1, column=0, sticky="news", padx=20, pady=10)
 
-        self.check_terms = Checkbutton(self.terms_frame, text="I have read and agree to the terms"
-                                                              " and conditions.")
+        self.check_terms_status = BooleanVar()
+        self.check_terms = Checkbutton(self.terms_frame,
+                                       text="I have read and agree to the terms"
+                                            " and conditions.",
+                                       variable=self.check_terms_status,
+                                       onvalue=1, offvalue=0)
         self.check_terms.grid(row=0, column=0, sticky='w')
-        self.check_rules = Checkbutton(self.terms_frame, text="I understand I am responsible for"
-                                                              " abiding by the contest rules.")
+        self.check_rules_status = BooleanVar()
+        self.check_rules = Checkbutton(self.terms_frame,
+                                       text="I understand I am responsible for"
+                                            " abiding by the contest rules.",
+                                       variable=self.check_rules_status,
+                                       onvalue=1, offvalue=0)
         self.check_rules.grid(row=1, column=0, sticky='w')
 
         for widget in self.terms_frame.winfo_children():
@@ -75,12 +84,17 @@ class GUI:
         email = self.entry_email.get()
         phone = self.entry_phone.get()
         status = self.combobox_status.get()
+        terms_status = self.check_terms_status.get()
+        rules_status = self.check_rules_status.get()
 
-        self.clear()
-
-        with open('records.csv', 'a', newline='') as csvfile:
-            content = csv.writer(csvfile, delimiter=',')
-            content.writerow([last_name, first_name, age, email, phone, status])
+        if terms_status and rules_status:
+            self.clear()
+            with open('records.csv', 'a', newline='') as csvfile:
+                content = csv.writer(csvfile, delimiter=',')
+                content.writerow([last_name, first_name, age, email, phone, status])
+        elif not terms_status or not rules_status:
+            messagebox.showerror("Checkbox Error", "Users must agree to the Terms and conditions as well as "
+                                                   "the contest rules before am entry can be submitted.")
 
     def clear(self):
         self.entry_first.delete(0, END)
@@ -90,3 +104,5 @@ class GUI:
         self.entry_email.delete(0, END)
         self.entry_phone.delete(0, END)
         self.combobox_status.delete(0, END)
+        self.check_terms.deselect()
+        self.check_rules.deselect()
