@@ -2,6 +2,7 @@ import csv
 import re
 from tkinter import *
 from tkinter import messagebox
+from random import randrange
 
 messagebox.showinfo("Contest Info", f"Students may enter as many times as they please.\n"
                                     f"Proper contact info is encouraged so winners can receive their prize.\n"
@@ -88,8 +89,8 @@ class GUI:
             content = csv.writer(csvfile, delimiter=',')
             content.writerow("0")
 
-        self.id_list = []
-        self.entry_totals = {}
+        with open('entry_count.csv', 'w', newline='') as csvfile:
+            content = csv.writer(csvfile, delimiter=',')
 
     def clicked_submit(self):
         first_name = self.entry_first.get()
@@ -139,18 +140,32 @@ class GUI:
         self.check_rules.deselect()
 
     def selection(self):
+        row_count = 0
+        id_list = []
+        entry_totals = {}
+
         with open('contestants.csv', 'r') as csvfile:
             reader = csv.reader(csvfile)
             next(reader)
-            for line in reader:
-                student_id = line[0]
-                self.id_list.append(student_id)
-            for the_id in self.id_list:
-                self.entry_totals[the_id] = self.entry_totals.get(the_id, 0) + 1
+            reader_list = list(reader)
+
+            for index in reader_list:
+                row_count += 1  # counts number of rows so the proper range
+                # can be used when generating random numbers
+                student_id = index[0]
+                id_list.append(student_id)  # Places all IDs into a list.
+            for the_id in id_list:  # Counts the number of entries per ID and pairs them in a dictionary.
+                entry_totals[the_id] = entry_totals.get(the_id, 0) + 1
+
+            winner = reader_list[randrange(row_count)]  # Selects the winning index
+            winner_name = f"{winner[2]} {winner[1]}"
+            winner_id = winner[0]
+            winner_num_entries = entry_totals.get(winner_id)
 
         with open('entry_count.csv', 'w', newline='') as csvfile:
             content = csv.writer(csvfile, delimiter=',')
-            for key, value in self.entry_totals.items():
+            for key, value in entry_totals.items():
                 content.writerow([key, value])
 
-        # messagebox.showinfo("WINNER SELECTED", f"The winner is {first_name} {last_name} with {num_entries}!")
+        messagebox.showinfo("WINNER SELECTED", f"The winner is {winner_name} ({winner_id}) with "
+                                               f"{winner_num_entries} entries!")
