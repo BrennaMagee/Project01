@@ -1,6 +1,12 @@
 import csv
+import re
 from tkinter import *
 from tkinter import messagebox
+
+messagebox.showinfo("Contest Info", f"Students may enter as many times as they please.\n"
+                                    f"Proper contact info is encouraged so winners can receive their prize.\n"
+                                    f"Student ID numbers will be used to identify how many entries "
+                                    f"were made by each student.\n")
 
 
 class GUI:
@@ -73,7 +79,17 @@ class GUI:
         self.button_submit.grid(row=2, column=0, sticky="news", padx=20, pady=5)
 
         self.button_clear = Button(self.frame, text='CLEAR ENTRY', command=self.clear)
-        self.button_clear.grid(row=3, column=0, sticky="news", padx=20, pady=10)
+        self.button_clear.grid(row=3, column=0, sticky="news", padx=20, pady=5)
+
+        self.button_winner = Button(self.frame, text='SEE WHO WINS', command=self.selection)
+        self.button_winner.grid(row=4, column=0, sticky="news", padx=20, pady=5)
+
+        with open('contestants.csv', 'w', newline='') as csvfile:
+            content = csv.writer(csvfile, delimiter=',')
+            content.writerow("0")
+
+        self.id_list = []
+        self.entry_totals = {}
 
     def clicked_submit(self):
         first_name = self.entry_first.get()
@@ -85,14 +101,31 @@ class GUI:
         terms_status = self.check_terms_status.get()
         rules_status = self.check_rules_status.get()
 
-        if terms_status and rules_status:
+        email_check = re.compile(r'^([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
+        phone_check = re.compile(r'^([0-9]{3})-([0-9]{3})-([0-9]{4})$')
+        id_check = re.compile(r'^([0-9]{8})$')
+
+        if not first_name.isalpha():
+            messagebox.showwarning("Invalid First Name", "Names should only contain alphabetic characters.")
+        elif not last_name.isalpha():
+            messagebox.showwarning("Invalid Last Name", "Names should only contain alphabetic characters.")
+        elif not email_check.search(email):
+            messagebox.showwarning("Invalid Email", "The email entry does not contain an '@' symbol. Please "
+                                                    "enter a valid email")
+        elif not phone_check.search(phone):
+            messagebox.showwarning("Invalid Phone Number", "Phone number entries should follow "
+                                                           "the format XXX-XXX-XXXX.")
+        elif not id_check.search(student_id):
+            messagebox.showwarning("Invalid Student ID", "A student ID is a unique 8 number sequence used "
+                                                         "to verify a student's identity. Please enter your ID.")
+        elif not terms_status or not rules_status:
+            messagebox.showwarning("Checkbox Warning", "Users must agree to the Terms and conditions as well as "
+                                                       "the contest rules before am entry can be submitted.")
+        else:
             self.clear()
             with open('contestants.csv', 'a', newline='') as csvfile:
                 content = csv.writer(csvfile, delimiter=',')
                 content.writerow([student_id, last_name, first_name, age, email, phone])
-        elif not terms_status or not rules_status:
-            messagebox.showerror("Checkbox Error", "Users must agree to the Terms and conditions as well as "
-                                                   "the contest rules before am entry can be submitted.")
 
     def clear(self):
         self.entry_first.delete(0, END)
@@ -104,3 +137,20 @@ class GUI:
         self.entry_id.delete(0, END)
         self.check_terms.deselect()
         self.check_rules.deselect()
+
+    def selection(self):
+        with open('contestants.csv', 'r') as csvfile:
+            reader = csv.reader(csvfile)
+            next(reader)
+            for line in reader:
+                student_id = line[0]
+                self.id_list.append(student_id)
+            for the_id in self.id_list:
+                self.entry_totals[the_id] = self.entry_totals.get(the_id, 0) + 1
+
+        with open('entry_count.csv', 'w', newline='') as csvfile:
+            content = csv.writer(csvfile, delimiter=',')
+            for key, value in self.entry_totals.items():
+                content.writerow([key, value])
+
+        # messagebox.showinfo("WINNER SELECTED", f"The winner is {first_name} {last_name} with {num_entries}!")
