@@ -134,7 +134,7 @@ class GUI:
         elif not last_name.isalpha():
             messagebox.showwarning("Invalid Last Name", "Names should only contain alphabetic characters.")
         elif not email_check.search(email):
-            messagebox.showwarning("Invalid Email", "The email entry does not contain an '@' symbol. Please "
+            messagebox.showwarning("Invalid Email", "The email entry is either missing an '@' or a period. Please "
                                                     "enter a valid email")
         elif not phone_check.search(phone):
             messagebox.showwarning("Invalid Phone Number", "Phone number entries should follow "
