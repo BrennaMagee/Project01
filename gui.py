@@ -1,7 +1,6 @@
 import csv
 from tkinter import *
 from tkinter import messagebox
-from tkinter.ttk import Combobox
 
 
 class GUI:
@@ -39,11 +38,10 @@ class GUI:
         self.entry_phone = Entry(self.user_info_frame)
         self.entry_phone.grid(row=3, column=1)
 
-        self.label_status = Label(self.user_info_frame, text='Status')
-        self.label_status.grid(row=2, column=2)
-        self.combobox_status = Combobox(self.user_info_frame, values=["Full-time", "Part-time", "Student",
-                                                                     "Unemployed", "Prefer not to answer"])
-        self.combobox_status.grid(row=3, column=2)
+        self.label_id = Label(self.user_info_frame, text='Student ID')
+        self.label_id.grid(row=2, column=2)
+        self.entry_id = Entry(self.user_info_frame)
+        self.entry_id.grid(row=3, column=2)
 
         for widget in self.user_info_frame.winfo_children():
             widget.grid_configure(padx=5, pady=5)
@@ -83,15 +81,15 @@ class GUI:
         age = self.spinbox_age.get()
         email = self.entry_email.get()
         phone = self.entry_phone.get()
-        status = self.combobox_status.get()
+        student_id = self.entry_id.get()
         terms_status = self.check_terms_status.get()
         rules_status = self.check_rules_status.get()
 
         if terms_status and rules_status:
             self.clear()
-            with open('records.csv', 'a', newline='') as csvfile:
+            with open('contestants.csv', 'a', newline='') as csvfile:
                 content = csv.writer(csvfile, delimiter=',')
-                content.writerow([last_name, first_name, age, email, phone, status])
+                content.writerow([student_id, last_name, first_name, age, email, phone])
         elif not terms_status or not rules_status:
             messagebox.showerror("Checkbox Error", "Users must agree to the Terms and conditions as well as "
                                                    "the contest rules before am entry can be submitted.")
@@ -103,6 +101,6 @@ class GUI:
         self.spinbox_age.insert(0, '18')
         self.entry_email.delete(0, END)
         self.entry_phone.delete(0, END)
-        self.combobox_status.delete(0, END)
+        self.entry_id.delete(0, END)
         self.check_terms.deselect()
         self.check_rules.deselect()
