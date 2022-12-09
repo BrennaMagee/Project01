@@ -114,14 +114,14 @@ class GUI:
         """
         Method to pull information from the form, validate it, then write it to the contestants file.
         """
-        first_name = self.entry_first.get()
-        last_name = self.entry_last.get()
-        age = self.spinbox_age.get()
-        email = self.entry_email.get()
-        phone = self.entry_phone.get()
-        student_id = self.entry_id.get()
-        terms_status = self.check_terms_status.get()
-        rules_status = self.check_rules_status.get()
+        first_name: str = self.entry_first.get()
+        last_name: str = self.entry_last.get()
+        age: str = self.spinbox_age.get()
+        email: str = self.entry_email.get()
+        phone: str = self.entry_phone.get()
+        student_id: str = self.entry_id.get()
+        terms_status: bool = self.check_terms_status.get()
+        rules_status: bool = self.check_rules_status.get()
 
         # Regular expressions used to check the validity of input
         email_check = re.compile(r'^([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
@@ -169,28 +169,28 @@ class GUI:
         """
         Method to select the winner of the contest and output the notification box alerting everyone who won.
         """
-        row_count = 0
-        id_list = []
-        entry_totals = {}
+        row_count: int = 0
+        id_list: list = []
+        entry_totals: dict = {}
 
         # Reads file of contestant information
         with open('contestants.csv', 'r') as csvfile:
             reader = csv.reader(csvfile)
             next(reader)  # Skips the zero placed in the first line.
-            reader_list = list(reader)
+            reader_list: list = list(reader)
 
             for index in reader_list:
                 row_count += 1  # counts number of rows so the proper range
                 # can be used when generating random numbers for winner selection.
-                student_id = index[0]
+                student_id: int = index[0]
                 id_list.append(student_id)  # Places all IDs into a list.
             for the_id in id_list:  # Counts the number of entries per ID and pairs them in a dictionary.
                 entry_totals[the_id] = entry_totals.get(the_id, 0) + 1
 
             winner = reader_list[randrange(row_count)]  # Selects the winning index
-            winner_name = f"{winner[2]} {winner[1]}"
-            winner_id = winner[0]
-            winner_num_entries = entry_totals.get(winner_id)
+            winner_name: str = f"{winner[2]} {winner[1]}"
+            winner_id: int = winner[0]
+            winner_num_entries: int = entry_totals.get(winner_id)
 
         # Writes the student ID and number of entries per ID so users can see how many entries each user had.
         with open('entry_count.csv', 'w', newline='') as csvfile:
